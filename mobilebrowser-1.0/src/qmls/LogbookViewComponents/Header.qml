@@ -61,4 +61,10 @@ BorderImage {
 
       onClicked: { if (appcore) { appcore.showBrowserView(); } }
    }
+
+   onActiveFocusChanged: {
+       if (activeFocus) {
+           doneButton.forceActiveFocus();
+       }
+   }
 }

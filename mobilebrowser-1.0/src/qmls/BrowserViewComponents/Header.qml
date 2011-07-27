@@ -25,6 +25,12 @@ import Qt 4.7
 import "../common"
 
 Item {
+
+   property FieldText fieldText: fieldText
+   property color focusColor: "orange"
+   property int focusBorderWidth: 3
+   property color focusBorderColor: "blue"
+
    id: header
    property alias loading: fieldText.loading
 
@@ -90,9 +96,38 @@ Item {
             from: 360; to: 0; loops: Animation.Infinite; easing.type: "Linear"; duration: 5000;
          }
 
+         KeyNavigation.left: quitButton
+         KeyNavigation.right: quitButton
+         KeyNavigation.down: fieldText.textEdit
+
+         Rectangle {
+             id: busyLoadingIconFocusedUnderlay
+             anchors.fill: parent
+             anchors.margins: 3
+             color: header.focusColor
+             border.color: header.focusBorderColor
+             border.width: header.focusBorderWidth
+             radius: 5
+             opacity: 0
+         }
+
+         onActiveFocusChanged: {
+             if (activeFocus) {
+                 busyLoadingIconFocusedUnderlay.opacity = 0.2;
+             } else {
+                 busyLoadingIconFocusedUnderlay.opacity = 0;
+             }
+         }
+
+         Keys.onSpacePressed: {
+             mainWindow.showMinimized();
+         }
+
          MouseArea {
              anchors.fill:parent
-             onClicked: mainWindow.showMinimized()
+             onClicked: {
+                 mainWindow.showMinimized();
+             }
          }
 
       }
@@ -133,9 +168,40 @@ Item {
          anchors.rightMargin: 2
          opacity: 0.7
 
+         KeyNavigation.left: busyLoadingIcon
+         KeyNavigation.right: busyLoadingIcon
+         KeyNavigation.down: fieldText.textEdit
+
+         Rectangle {
+             id: quitButtonFocusedUnderlay
+             anchors.fill: parent
+             anchors.margins: 3
+             color: header.focusColor
+             border.color: header.focusBorderColor
+             border.width: header.focusBorderWidth
+             radius: 5
+             opacity: 0
+         }
+
+         onActiveFocusChanged: {
+             if (activeFocus) {
+                 quitButtonFocusedUnderlay.opacity = 0.2;
+             } else {
+                 quitButtonFocusedUnderlay.opacity = 0;
+             }
+         }
+
+         Keys.onSpacePressed: {
+             Qt.quit();
+         }
+
          MouseArea {
             anchors.fill: parent
-            onClicked: { Qt.quit(); }
+
+            onClicked: {
+                Qt.quit();
+            }
+
             onPressed: { parent.opacity = 1; }
             onReleased: { parent.opacity = 0.7; }
          }

@@ -22,12 +22,25 @@
 
 import Qt 4.7
 
+FocusScope {
+    //FocusScope needs to bind to visual properties of the children
+    property alias imageSource: icon.source
+    property alias text: label.text
+    property alias selected: tabButton.selected
+
+    signal tabButtonSelected
+
 Rectangle {
    id: tabButton
-   property alias imageSource: icon.source
-   property alias text: label.text
    property bool selected: false
 
+   property color focusColor: "orange"
+   property int focusBorderWidth: 3
+   property color focusBorderColor: "blue"
+
+   focus: true
+   width: parent.width
+   height: parent.height
    z: 0
    color: "transparent"
    state: "normal"
@@ -64,6 +77,35 @@ Rectangle {
       z: 2
    }
 
+   MouseArea {
+       anchors.fill: parent
+       onClicked: {
+           parent.forceActiveFocus();
+           parent.parent.tabButtonSelected();
+       }
+   }
+
+   Rectangle {
+       id: tabButtonFocusedUnderlay
+       anchors.fill: parent
+       anchors.margins: 3
+       color: parent.focusColor
+       border.color: parent.focusBorderColor
+       border.width: parent.focusBorderWidth
+       radius: 5
+       z: 1
+       opacity: 0
+   }
+
+   onActiveFocusChanged: {
+       if (activeFocus) {
+           parent.tabButtonSelected();
+           tabButtonFocusedUnderlay.opacity = 0.2;
+       } else {
+           tabButtonFocusedUnderlay.opacity = 0;
+       }
+   }
+
    states: [
       State {
          name: "normal"
@@ -76,4 +118,5 @@ Rectangle {
          PropertyChanges { target: tabButtonSelectedUnderlay; opacity: 0.2; }
       }
    ]
+}
 }

@@ -33,7 +33,7 @@
 #define NETWORK_PROXY_PORT      3128
 
 /** ------------------------------------- OpenGL default Config */
-#define USE_OPENGL
+//BAS_TEMP  #define USE_OPENGL
 
 /** ------------------------------------- Platform specific undefs */
 // "Symbian" undefs

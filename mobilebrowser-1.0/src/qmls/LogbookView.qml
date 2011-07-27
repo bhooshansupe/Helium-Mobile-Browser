@@ -69,6 +69,8 @@ Item {
       anchors.left: parent.left
       anchors.right: parent.right
       z: 2
+
+      KeyNavigation.down: (tabs.selectedTab == 0 ? bookmarks : (tabs.selectedTab == 1? mostVisited : history))
    }
 
    // Tabs-Container
@@ -84,6 +86,9 @@ Item {
          height: logbookView.height - tabs.height - header.height
          model: bookmarksModel
          z: 1
+
+         KeyNavigation.up: header
+         KeyNavigation.down: tabs
       }
 
       MostVisitedListView {
@@ -92,6 +97,9 @@ Item {
          height: logbookView.height - tabs.height - header.height
          model: mostVisitedModel
          z: 1
+
+         KeyNavigation.up: header
+         KeyNavigation.down: tabs
       }
 
       HistoryListView {
@@ -100,6 +108,9 @@ Item {
          height: logbookView.height - tabs.height - header.height
          model: historyModel
          z: 1
+
+         KeyNavigation.up: header
+         KeyNavigation.down: tabs
       }
 
       states: [

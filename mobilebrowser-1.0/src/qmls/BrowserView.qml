@@ -104,6 +104,8 @@ Item {
          id: footer
          z: 3
 
+         KeyNavigation.up: webView.webView
+
          onLostFocus: { webView.focus = true; }
          onBookmarkAdded: {
             var component = Qt.createComponent("common/TemporaryMessageWithIcon.qml");

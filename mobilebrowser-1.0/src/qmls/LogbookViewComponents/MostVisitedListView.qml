@@ -38,6 +38,10 @@ LogbookListView {
          height: 70
          color: "#fff"
 
+         property color focusColor: "orange"
+         property int focusBorderWidth: 3
+         property color focusBorderColor: "blue"
+
          BorderImage {
             source: "qrc:/qmls/pics/url-list-bg-10x60.png"
             border.top: 1
@@ -128,9 +132,35 @@ LogbookListView {
             color: "#FF6600"
          }
 
+         Rectangle {
+            id: focuseRect
+            anchors.fill: parent;
+            anchors.margins: 3
+            color: parent.focusColor
+            border.color: parent.focusBorderColor
+            border.width: parent.focusBorderWidth
+            radius: 5
+            opacity: 0
+         }
+
+         onActiveFocusChanged: {
+             if (activeFocus) {
+                 focuseRect.opacity = 0.2;
+             } else {
+                 focuseRect.opacity = 0;
+             }
+         }
+
+         Keys.onSpacePressed: {
+             if ( appcore ) {
+                 appcore.currentUrl = model.url;
+             }
+         }
+
          MouseArea {
             anchors.fill: parent
             onPressed: { delegateUiHover.opacity = 0.4; }
+            onClicked: { parent.forceActiveFocus(); }
             onReleased: { if ( appcore ) { appcore.currentUrl = model.url; } delegateUiHover.opacity = 0; }
             onExited: { delegateUiHover.opacity = 0; }
          }

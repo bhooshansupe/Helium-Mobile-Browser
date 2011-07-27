@@ -50,10 +50,15 @@ BorderImage {
       width: parent.width/3
       height: parent.height
       selected: selectedTab == 0
+      focus: selectedTab == 0
 
-      MouseArea {
-         anchors.fill: parent
-         onClicked: { selectedTab = 0; }
+      KeyNavigation.up: bookmarks
+      KeyNavigation.left: historyTab
+      KeyNavigation.right: mostVisitedTab
+
+      onTabButtonSelected: {
+         selectedTab = 0;
+         focus = true;
       }
    }
 
@@ -67,9 +72,13 @@ BorderImage {
       height: parent.height
       selected: selectedTab == 1
 
-      MouseArea {
-         anchors.fill: parent
-         onClicked: { selectedTab = 1; }
+      KeyNavigation.up: mostVisited
+      KeyNavigation.left: bookmarksTab
+      KeyNavigation.right: historyTab
+
+      onTabButtonSelected: {
+         selectedTab = 1;
+         focus = true;
       }
    }
 
@@ -83,9 +92,27 @@ BorderImage {
       height: parent.height
       selected: selectedTab == 2
 
-      MouseArea {
-         anchors.fill: parent
-         onClicked: { selectedTab = 2; }
+      KeyNavigation.up: history
+      KeyNavigation.left: mostVisitedTab
+      KeyNavigation.right: bookmarksTab
+
+      onTabButtonSelected: {
+         selectedTab = 2;
+         focus = true;
       }
+   }
+
+   onActiveFocusChanged: {
+       if (activeFocus) {
+           if (selectedTab == 0) {
+               bookmarksTab.forceActiveFocus();
+           }
+           if (selectedTab == 1) {
+               mostVisitedTab.forceActiveFocus();
+           }
+           if (selectedTab == 2) {
+               historyTab.forceActiveFocus();
+           }
+       }
    }
 }

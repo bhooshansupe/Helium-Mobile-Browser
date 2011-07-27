@@ -50,6 +50,9 @@ BorderImage {
       anchors.left: parent.left
       anchors.leftMargin: 5
       anchors.verticalCenter: parent.verticalCenter
+
+      KeyNavigation.left: logbookviewbutton
+      KeyNavigation.right: homebutton
    }
 
    // Home Button
@@ -64,6 +67,9 @@ BorderImage {
       anchors.left: backbutton.right
       anchors.leftMargin: 5
       anchors.verticalCenter: parent.verticalCenter
+
+      KeyNavigation.left: backbutton.enabled? backbutton : logbookviewbutton
+      KeyNavigation.right: forwardbutton.enabled? forwardbutton : newbookmarkbutton
    }
 
    // Forward Button
@@ -78,6 +84,9 @@ BorderImage {
       anchors.left: homebutton.right
       anchors.leftMargin: 5
       anchors.verticalCenter: parent.verticalCenter
+
+      KeyNavigation.left: homebutton
+      KeyNavigation.right: newbookmarkbutton
    }
 
    // New Bookmark Button
@@ -91,6 +100,9 @@ BorderImage {
       anchors.right: logbookviewbutton.left
       anchors.rightMargin: 5
       anchors.verticalCenter: parent.verticalCenter
+
+      KeyNavigation.left: forwardbutton
+      KeyNavigation.right: logbookviewbutton
    }
 
    // LogbookView Button
@@ -104,5 +116,14 @@ BorderImage {
       anchors.right: parent.right
       anchors.rightMargin: 5
       anchors.verticalCenter: parent.verticalCenter
+
+      KeyNavigation.left: newbookmarkbutton
+      KeyNavigation.right: backbutton.enabled? backbutton : homebutton
+   }
+
+   onActiveFocusChanged: {
+       if (activeFocus) {
+           homebutton.forceActiveFocus();
+       }
    }
 }

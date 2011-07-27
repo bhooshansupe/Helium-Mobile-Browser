@@ -29,6 +29,11 @@ Item {
    property string text: ""
    property bool mouseGrabbed: false
    property bool loading: false
+   property TextInput textEdit: textEdit
+
+   property color focusColor: "orange"
+   property int focusBorderWidth: 3
+   property color focusBorderColor: "blue"
 
    signal editFinished
    signal editAborted
@@ -38,14 +43,14 @@ Item {
 
    function updateFavIcon() {
       //console.log("fieldText.setFavIcon()");
-      defaultFavIcon.opacity = 0;
-      favIcon.opacity = 1;
+      leftImage.source = "image://favicons/"+webView.url;
+      leftImage.opacity = 1;
    }
 
    function setDefaultFavIcon() {
       //console.log("fieldText.setDefaultFavIcon()");
-      favIcon.opacity = 0;
-      defaultFavIcon.opacity = 0.7;
+      leftImage.source = "qrc:/qmls/pics/default-favico-30x30.png";
+      leftImage.opacity = 0.7;
    }
 
    // Set the "fieldText" to "editingUrl" state, and emit the "editStarted" signal
@@ -78,7 +83,7 @@ Item {
    }
 
    Image {
-      id: favIcon
+      id: leftImage
       height: parent.height-8
       width: height
       smooth: true; asynchronous: true;
@@ -88,19 +93,6 @@ Item {
       anchors.leftMargin: 4
       opacity: 0;
       source: "image://favicons/"+webView.url
-   }
-
-   Image {
-      id: defaultFavIcon
-      height: parent.height-8
-      width: height
-      smooth: true
-      fillMode: Image.PreserveAspectFit
-      anchors.verticalCenter: parent.verticalCenter
-      anchors.left: parent.left
-      anchors.leftMargin: 4
-      source: "qrc:/qmls/pics/default-favico-30x30.png"
-      opacity: 1
    }
 
    // TextInput box in which the User types the URL
@@ -113,9 +105,9 @@ Item {
          value: fieldText.text
       }
 
-      anchors.left: defaultFavIcon.right
+      anchors.left: leftImage.right
       anchors.leftMargin: 4
-      anchors.right: reloadIcon.left
+      anchors.right: rightImage.left
       anchors.rightMargin: 4
       anchors.verticalCenter: parent.verticalCenter
       color: "#444444"
@@ -123,18 +115,47 @@ Item {
       font.bold: false
       font.pointSize: 18
       readOnly: true
+
+      KeyNavigation.up: quitButton
+      KeyNavigation.down: webView.webView
+      KeyNavigation.right: rightImage
+      KeyNavigation.left: rightImage
+
+      Rectangle {
+          id: textEditFocusedUnderlay
+          anchors.fill: parent
+          anchors.margins: 3
+          color: fieldText.focusColor
+          border.color: fieldText.focusBorderColor
+          border.width: fieldText.focusBorderWidth
+          radius: 5
+          opacity: 0
+      }
+
+      onActiveFocusChanged: {
+          if (activeFocus) {
+              textEditFocusedUnderlay.opacity = 0.2;
+              edit();
+          } else {
+              textEditFocusedUnderlay.opacity = 0;
+          }
+      }
+
       onAccepted: { finishEdit(); }
       Keys.onEscapePressed: { abortEdit(); }
 
       MouseArea {
          id: editRegion
          anchors.fill: parent
-         onClicked: { edit(); }
+         onClicked: {
+             parent.forceActiveFocus();
+             edit();
+         }
       }
    }
 
    Image {
-      id: reloadIcon
+      id: rightImage
       height: parent.height-4
       width: height
       smooth: true
@@ -143,45 +164,56 @@ Item {
       anchors.rightMargin: 4
       source: "qrc:/qmls/pics/reload-30x30.png"
       opacity: 0.7
-      MouseArea {
-         anchors.fill: parent
-         onClicked: { fieldText.reloadRequested(); }
-         onPressed: { parent.opacity = 1; }
-         onReleased: { parent.opacity = 0.7; }
-      }
-   }
 
-   Image {
-      id: clearIcon
-      height: parent.height-4
-      width: height
-      smooth: true
-      anchors.verticalCenter: parent.verticalCenter
-      anchors.right: parent.right
-      anchors.rightMargin: 4
-      source: "qrc:/qmls/pics/clear-30x30.png"
-      opacity: 0
-      MouseArea {
-         anchors.fill: parent
-         onClicked: { textEdit.text = ''; }
-         onPressed: { parent.opacity = 1; }
-         onReleased: { parent.opacity = 0.7; }
-      }
-   }
+      KeyNavigation.up: quitButton
+      KeyNavigation.down: webView.webView
+      KeyNavigation.right: textEdit
+      KeyNavigation.left: textEdit
 
-   Image {
-      id: stopIcon
-      height: parent.height-4
-      width: height
-      smooth: true
-      anchors.verticalCenter: parent.verticalCenter
-      anchors.right: parent.right
-      anchors.rightMargin: 4
-      source: "qrc:/qmls/pics/stop-30x30.png"
-      opacity: 0
+      Rectangle {
+          id: rightImageFocusedUnderlay
+          anchors.fill: parent
+          anchors.margins: 3
+          color: fieldText.focusColor
+          border.color: fieldText.focusBorderColor
+          border.width: fieldText.focusBorderWidth
+          radius: 5
+          opacity: 0
+      }
+
+      onActiveFocusChanged: {
+          if (activeFocus) {
+              rightImageFocusedUnderlay.opacity = 0.2;
+          } else {
+              rightImageFocusedUnderlay.opacity = 0;
+          }
+      }
+
+      Keys.onSpacePressed: {
+         if (rightImage.source == "qrc:/qmls/pics/reload-30x30.png") {
+            fieldText.reloadRequested();
+         } else if (rightImage.source == "qrc:/qmls/pics/clear-30x30.png") {
+            textEdit.text = '';
+         } else if (rightImage.source == "qrc:/qmls/pics/stop-30x30.png") {
+            fieldText.stopRequested();
+         }
+      }
+
       MouseArea {
          anchors.fill: parent
-         onClicked: { fieldText.stopRequested(); }
+
+         onClicked: {
+             parent.forceActiveFocus();
+
+             if (parent.source == "qrc:/qmls/pics/reload-30x30.png") {
+                fieldText.reloadRequested();
+             } else if (parent.source == "qrc:/qmls/pics/clear-30x30.png") {
+                textEdit.text = '';
+             } else if (parent.source == "qrc:/qmls/pics/stop-30x30.png") {
+                fieldText.stopRequested();
+             }
+         }
+
          onPressed: { parent.opacity = 1; }
          onReleased: { parent.opacity = 0.7; }
       }
@@ -191,16 +223,9 @@ Item {
    State {
       name: "editingUrl"
       PropertyChanges {
-         target: clearIcon
+         target: rightImage
+         source: "qrc:/qmls/pics/clear-30x30.png"
          opacity: 0.7
-      }
-      PropertyChanges {
-         target: reloadIcon
-         opacity: 0
-      }
-      PropertyChanges {
-         target: stopIcon
-         opacity: 0
       }
       PropertyChanges {
          target: textEdit
@@ -221,16 +246,9 @@ Item {
       name: "loadingUrl"
       when: fieldText.loading
       PropertyChanges {
-         target: clearIcon
-         opacity: 0
-      }
-      PropertyChanges {
-         target: reloadIcon
-         opacity: 0
-      }
-      PropertyChanges {
-         target: stopIcon
-         opacity: 0.7
+          target: rightImage
+          source: "qrc:/qmls/pics/stop-30x30.png"
+          opacity: 0.7
       }
    }
    ]

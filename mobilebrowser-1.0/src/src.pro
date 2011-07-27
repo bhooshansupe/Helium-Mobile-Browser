@@ -7,8 +7,9 @@ QT += declarative \
     core \
     network \
     webkit \
-    opengl \
     sql
+
+usegl:QT += opengl
 
 include(utility/utility.pri)
 include(models/models.pri)

@@ -37,6 +37,8 @@ Flickable {
    property alias icon: webView.icon
    property bool loading: webView.progress != 1.0
 
+   property WebView webView: webView
+
    // Signals
    signal gotFocus
    signal lostFocus
@@ -50,7 +52,7 @@ Flickable {
 
    width: parent.width
    contentWidth: Math.max(parent.width,webView.width)
-   contentHeight: Math.max(parent.height,webView.height)   
+   contentHeight: Math.max(parent.height,webView.height)
    onWidthChanged: {
       // Expand (but not above 1:1) if otherwise would be smaller that available width.
       if (width > webView.width*webView.contentsScale && webView.contentsScale < 1.0)
@@ -89,7 +91,9 @@ Flickable {
       Connections {
          target: appcore
          onCurrentUrlChanged: { webView.url = appcore.fixUrl(appcore.currentUrl); }
-         onShowingBrowserView: { webView.focus = true; }
+         onShowingBrowserView: {
+             webView.focus = true;
+         }
       }
 
       smooth: false // We don't want smooth scaling, since we only scale during (fast) transitions
@@ -102,10 +106,17 @@ Flickable {
       // [Signal Handling]
       Keys.onLeftPressed: { webView.contentsScale -= 0.1; }
       Keys.onRightPressed: { webView.contentsScale += 0.1; }
+
+      KeyNavigation.up: header.fieldText.textEdit
+      KeyNavigation.down: footer
+
       onAlert: { console.log(message); }
       onFocusChanged: {
-         if ( focus == true ) { flickable.gotFocus(); }
-         else { flickable.lostFocus(); }
+         if ( focus == true ) {
+             flickable.gotFocus();
+         } else {
+             flickable.lostFocus();
+         }
       }
       onContentsSizeChanged: { webView.contentsScale = Math.min(1,flickable.width / contentsSize.width); }
       onUrlChanged: {
@@ -127,10 +138,44 @@ Flickable {
          }
       }
       onIconChanged: { flickable.iconChanged(); }
-      onLoadFinished: { if ( appcore ) { appcore.historyCurrentUrl(); } }
-      onLoadFailed: { webView.stop.trigger(); }
+
+      onLoadFinished: {
+          if ( appcore ) {
+              appcore.historyCurrentUrl();
+          }
+      }
+
+      onLoadFailed: {
+          webView.stop.trigger();
+      }
+
       onZoomTo: { doZoom(zoom,centerX,centerY); }
       // [/Signal Handling]
+
+      Component.onCompleted: {
+          //BAS_TEMP
+          runtime.utils.applyWebViewFocusFix(webView);
+      }
+
+      Rectangle {
+         id: focuseRect
+         anchors.fill: parent;
+         anchors.margins: 3
+         color: "transparent"
+         opacity: 0
+         z: parent.z + 1
+
+         states: [
+             State {
+                 name: "focused"; when: webView.activeFocus;
+                 PropertyChanges { target: focuseRect; color: "orange"; opacity: 0.2; }
+             },
+             State {
+                 name: "focusAway"; when: !webView.activeFocus;
+                 PropertyChanges { target: focuseRect; color: "blue"; opacity: 0.2; }
+             }
+         ]
+      }
 
       SequentialAnimation {
          id: quickZoom

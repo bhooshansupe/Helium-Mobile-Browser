@@ -2,7 +2,9 @@
 
 #include "buildconfig.h"
 
+#ifdef USE_OPENGL
 #include <QGLWidget>
+#endif
 
 MainView::MainView(QWidget *parent) :
       QDeclarativeView(parent)

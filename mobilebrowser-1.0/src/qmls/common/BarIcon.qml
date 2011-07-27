@@ -29,6 +29,9 @@ Item {
    property color highlightColor: "#fff"
    property int hightlightBorderWidth: 0
    property color highlightBorderColor: "#fff"
+   property color focusColor: "orange"
+   property int focusBorderWidth: 3
+   property color focusBorderColor: "blue"
    property int badgeValue: 0
    property color badgeColor: "red"
 
@@ -76,7 +79,42 @@ Item {
       z: 1
    }
 
-   MouseArea { id: pressMouseArea; anchors.fill: parent; onClicked: { if (parent.enabled) parent.clicked(); } }
+   Rectangle {
+      id: focuseRect
+      anchors.fill: parent;
+      anchors.margins: 3
+      color: parent.focusColor
+      border.color: parent.focusBorderColor
+      border.width: parent.focusBorderWidth
+      radius: 5
+      opacity: 0
+      z: 1
+   }
+
+   onActiveFocusChanged: {
+       if (activeFocus) {
+           focuseRect.opacity = 0.2;
+       } else {
+           focuseRect.opacity = 0;
+       }
+   }
+
+   Keys.onSpacePressed: {
+       if (barIcon.enabled) {
+           barIcon.clicked();
+       }
+   }
+
+   MouseArea {
+       id: pressMouseArea;
+       anchors.fill: parent;
+       onClicked: {
+           if (parent.enabled) {
+               parent.forceActiveFocus();
+               parent.clicked();
+           }
+       }
+   }
 
    states: [
    State {

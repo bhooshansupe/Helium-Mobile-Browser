@@ -25,9 +25,11 @@ import Qt 4.7
 Rectangle {
    id: embossedButton
 
+   property color focusColor: "orange"
+   property int focusBorderWidth: 3
+   property color focusBorderColor: "blue"
    property string text: "undefined"
    property int fontPointSize: 14
-   property bool highlight: false
    property bool pressed: false
    property color baseColor: "#22A"
    color: "transparent"
@@ -60,11 +62,38 @@ Rectangle {
       anchors.centerIn: parent
    }
 
+   Rectangle {
+      id: focuseRect
+      anchors.fill: parent;
+      anchors.margins: 3
+      color: parent.focusColor
+      border.color: parent.focusBorderColor
+      border.width: parent.focusBorderWidth
+      radius: 5
+      opacity: 0
+      z: 1
+   }
+
+   onActiveFocusChanged: {
+       if (activeFocus) {
+           focuseRect.opacity = 0.2;
+       } else {
+           focuseRect.opacity = 0;
+       }
+   }
+
+   Keys.onSpacePressed: {
+       embossedButton.clicked();
+   }
+
    MouseArea {
       anchors.fill: parent
       onPressed: { parent.pressed = true; }
       onReleased: { parent.pressed = false; }
-      onClicked: { parent.clicked(); }
+      onClicked: {
+          parent.forceActiveFocus();
+          parent.clicked();
+      }
    }
 
    states: [
@@ -74,13 +103,8 @@ Rectangle {
       PropertyChanges { target: embossedButton; color: Qt.darker(embossedButton.baseColor); }
    },
    State {
-      name: "highlight"
-      when: !embossedButton.pressed && embossedButton.highlight
-      PropertyChanges { target: embossedButton; color: Qt.lighter(embossedButton.baseColor); }
-   },
-   State {
       name: "normal"
-      when: !embossedButton.pressed && !embossedButton.highlight
+      when: !embossedButton.pressed
       PropertyChanges { target: embossedButton; color: embossedButton.baseColor; }
    }
    ]
